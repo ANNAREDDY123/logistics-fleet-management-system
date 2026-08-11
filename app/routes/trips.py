@@ -212,22 +212,22 @@ def start_trip(
         )
 
     trip.trip_status = "Started"
-    tracking = Tracking(
-    trip_id=trip.id,
-    location=trip.source,
-    status="Started",
-    remarks="Trip started",
-    timestamp=datetime.utcnow()
-)
 
-db.add(tracking)
+    tracking = Tracking(
+        trip_id=trip.id,
+        location=trip.source,
+        status="Started",
+        remarks="Trip started",
+        timestamp=datetime.utcnow()
+    )
+
+    db.add(tracking)
 
     db.commit()
 
     return {
         "message": "Trip started successfully."
     }
-
 
 
 # COMPLETE TRIP
@@ -264,15 +264,16 @@ def complete_trip(
     ).first()
 
     trip.trip_status = "Delivered"
-    tracking = Tracking(
-    trip_id=trip.id,
-    location=trip.destination,
-    status="Delivered",
-    remarks="Trip completed successfully",
-    timestamp=datetime.utcnow()
-)
 
-db.add(tracking)
+    tracking = Tracking(
+        trip_id=trip.id,
+        location=trip.destination,
+        status="Delivered",
+        remarks="Trip completed successfully",
+        timestamp=datetime.utcnow()
+    )
+
+    db.add(tracking)
 
     vehicle.status = "Available"
 
@@ -283,7 +284,6 @@ db.add(tracking)
     return {
         "message": "Trip completed successfully."
     }
-
 
 
 # CANCEL TRIP
@@ -320,15 +320,16 @@ def cancel_trip(
     ).first()
 
     trip.trip_status = "Cancelled"
-    tracking = Tracking(
-    trip_id=trip.id,
-    location=trip.destination,
-    status="Cancelled",
-    remarks="Trip cancelled",
-    timestamp=datetime.utcnow()
-)
 
-db.add(tracking)
+    tracking = Tracking(
+        trip_id=trip.id,
+        location=trip.destination,
+        status="Cancelled",
+        remarks="Trip cancelled",
+        timestamp=datetime.utcnow()
+    )
+
+    db.add(tracking)
 
     vehicle.status = "Available"
 
@@ -339,4 +340,3 @@ db.add(tracking)
     return {
         "message": "Trip cancelled successfully."
     }
-
