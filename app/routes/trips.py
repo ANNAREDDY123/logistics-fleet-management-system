@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import date
 
 from database import get_db
 from models import Trip, Vehicle, Driver
@@ -69,6 +70,12 @@ def create_trip(
             status_code=400,
             detail="Driver is inactive."
         )
+        if driver.license_expiry < date.today():
+
+    raise HTTPException(
+        status_code=400,
+        detail="Driver license has expired."
+    )
 
     active_vehicle_trip = db.query(
         Trip
