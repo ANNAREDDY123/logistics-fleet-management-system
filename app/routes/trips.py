@@ -64,31 +64,32 @@ def create_trip(
             detail="Driver not found."
         )
 
-    if driver.status == "Inactive":
+  if driver.status == "Inactive":
 
-        raise HTTPException(
-            status_code=400,
-            detail="Driver is inactive."
-        )
-     if driver.license_expiry < date.today():
+    raise HTTPException(
+        status_code=400,
+        detail="Driver is inactive."
+    )
+
+if driver.license_expiry < date.today():
 
     raise HTTPException(
         status_code=400,
         detail="Driver license has expired."
     )
 
-    active_vehicle_trip = db.query(
-        Trip
-    ).filter(
-        Trip.vehicle_id == trip.vehicle_id,
-        Trip.trip_status.in_(
-            [
-                "Scheduled",
-                "Started",
-                "In Transit"
-            ]
-        )
-    ).first()
+active_vehicle_trip = db.query(
+    Trip
+).filter(
+    Trip.vehicle_id == trip.vehicle_id,
+    Trip.trip_status.in_(
+        [
+            "Scheduled",
+            "Started",
+            "In Transit"
+        ]
+    )
+).first()
 
     if active_vehicle_trip:
 
