@@ -142,6 +142,7 @@ def create_trip(
 
     return new_trip
     
+
 # GET ALL TRIPS
 
 
@@ -150,14 +151,48 @@ def create_trip(
     response_model=list[TripResponse]
 )
 def get_all_trips(
+    trip_status: str = None,
+    source: str = None,
+    destination: str = None,
+    start_date: date = None,
+    page: int = 1,
+    limit: int = 10,
     db: Session = Depends(get_db)
 ):
 
-    return db.query(
-        Trip
+    query = db.query(Trip)
+
+    if trip_status:
+
+        query = query.filter(
+            Trip.trip_status == trip_status
+        )
+
+    if source:
+
+        query = query.filter(
+            Trip.source.ilike(f"%{source}%")
+        )
+
+    if destination:
+
+        query = query.filter(
+            Trip.destination.ilike(f"%{destination}%")
+        )
+
+    if start_date:
+
+        query = query.filter(
+            Trip.start_date == start_date
+        )
+
+    trips = query.offset(
+        (page - 1) * limit
+    ).limit(
+        limit
     ).all()
 
-
+    return trips
 
 # GET TRIP BY ID
 
