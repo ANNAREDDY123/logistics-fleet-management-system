@@ -59,23 +59,42 @@ def create_vehicle(
 
     return new_vehicle
 
-
 # GET ALL VEHICLES
-
 
 @router.get(
     "/",
     response_model=list[VehicleResponse]
 )
 def get_all_vehicles(
+    status: str = None,
+    vehicle_type: str = None,
+    page: int = 1,
+    limit: int = 10,
     db: Session = Depends(get_db)
 ):
 
-    return db.query(
-        Vehicle
+    query = db.query(Vehicle)
+
+    if status:
+
+        query = query.filter(
+            Vehicle.status == status
+        )
+
+    if vehicle_type:
+
+        query = query.filter(
+            Vehicle.vehicle_type == vehicle_type
+        )
+
+    vehicles = query.offset(
+        (page - 1) * limit
+    ).limit(
+        limit
     ).all()
 
-
+    return vehicles
+    
 # GET VEHICLE BY ID
 
 
