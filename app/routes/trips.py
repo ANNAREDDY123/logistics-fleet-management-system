@@ -70,7 +70,7 @@ def create_trip(
             status_code=400,
             detail="Driver is inactive."
         )
-        if driver.license_expiry < date.today():
+     if driver.license_expiry < date.today():
 
     raise HTTPException(
         status_code=400,
