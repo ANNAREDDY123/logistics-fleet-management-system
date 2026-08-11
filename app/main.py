@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from database import Base, engine
 
-from routes import auth, vehicles, drivers, trips, fuel, maintenance, tracking, dashboard
+from routes import auth, vehicles, drivers, trips, fuel, maintenance, tracking, dashboard, reports
 
 
 Base.metadata.create_all(bind=engine)
@@ -21,6 +21,7 @@ app.include_router(fuel.router)
 app.include_router(maintenance.router)
 app.include_router(tracking.router)
 app.include_router(dashboard.router)
+app.include_router(reports.router)
 
 @app.get("/")
 def home():
