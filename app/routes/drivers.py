@@ -73,49 +73,43 @@ def create_driver(
     return new_driver
 
 
+# ==========================
 # GET ALL DRIVERS
-
+# ==========================
 
 @router.get(
     "/",
     response_model=list[DriverResponse]
 )
 def get_all_drivers(
+    name: str = None,
+    status: str = None,
+    page: int = 1,
+    limit: int = 10,
     db: Session = Depends(get_db)
 ):
 
-    return db.query(
-        Driver
-    ).all()
+    query = db.query(Driver)
 
+    if name:
 
-# GET DRIVER BY ID
-
-
-@router.get(
-    "/{driver_id}",
-    response_model=DriverResponse
-)
-def get_driver_by_id(
-    driver_id: int,
-    db: Session = Depends(get_db)
-):
-
-    driver = db.query(
-        Driver
-    ).filter(
-        Driver.id == driver_id
-    ).first()
-
-    if not driver:
-
-        raise HTTPException(
-            status_code=404,
-            detail="Driver not found."
+        query = query.filter(
+            Driver.name.ilike(f"%{name}%")
         )
 
-    return driver
+    if status:
 
+        query = query.filter(
+            Driver.status == status
+        )
+
+    drivers = query.offset(
+        (page - 1) * limit
+    ).limit(
+        limit
+    ).all()
+
+    return drivers
 
 # UPDATE DRIVER
 
