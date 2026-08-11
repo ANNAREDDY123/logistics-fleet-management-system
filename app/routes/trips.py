@@ -31,7 +31,27 @@ def create_trip(
     )
 ):
 
-       driver = db.query(
+    vehicle = db.query(
+        Vehicle
+    ).filter(
+        Vehicle.id == trip.vehicle_id
+    ).first()
+
+    if not vehicle:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Vehicle not found."
+        )
+
+    if vehicle.status == "Maintenance":
+
+        raise HTTPException(
+            status_code=400,
+            detail="Vehicle is under maintenance."
+        )
+
+    driver = db.query(
         Driver
     ).filter(
         Driver.id == trip.driver_id
@@ -57,45 +77,19 @@ def create_trip(
             status_code=400,
             detail="Driver license has expired."
         )
-    driver = db.query(
-        Driver
+
+    active_vehicle_trip = db.query(
+        Trip
     ).filter(
-        Driver.id == trip.driver_id
-    ).first()
-
-    if not driver:
-
-        raise HTTPException(
-            status_code=404,
-            detail="Driver not found."
+        Trip.vehicle_id == trip.vehicle_id,
+        Trip.trip_status.in_(
+            [
+                "Scheduled",
+                "Started",
+                "In Transit"
+            ]
         )
-
-  if driver.status == "Inactive":
-
-    raise HTTPException(
-        status_code=400,
-        detail="Driver is inactive."
-    )
-
-if driver.license_expiry < date.today():
-
-    raise HTTPException(
-        status_code=400,
-        detail="Driver license has expired."
-    )
-
-active_vehicle_trip = db.query(
-    Trip
-).filter(
-    Trip.vehicle_id == trip.vehicle_id,
-    Trip.trip_status.in_(
-        [
-            "Scheduled",
-            "Started",
-            "In Transit"
-        ]
-    )
-).first()
+    ).first()
 
     if active_vehicle_trip:
 
@@ -146,7 +140,7 @@ active_vehicle_trip = db.query(
     db.refresh(new_trip)
 
     return new_trip
-
+    
 # GET ALL TRIPS
 
 
