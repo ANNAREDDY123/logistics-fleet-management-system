@@ -31,26 +31,32 @@ def create_trip(
     )
 ):
 
-    vehicle = db.query(
-        Vehicle
+       driver = db.query(
+        Driver
     ).filter(
-        Vehicle.id == trip.vehicle_id
+        Driver.id == trip.driver_id
     ).first()
 
-    if not vehicle:
+    if not driver:
 
         raise HTTPException(
             status_code=404,
-            detail="Vehicle not found."
+            detail="Driver not found."
         )
 
-    if vehicle.status == "Maintenance":
+    if driver.status == "Inactive":
 
         raise HTTPException(
             status_code=400,
-            detail="Vehicle is under maintenance."
+            detail="Driver is inactive."
         )
 
+    if driver.license_expiry < date.today():
+
+        raise HTTPException(
+            status_code=400,
+            detail="Driver license has expired."
+        )
     driver = db.query(
         Driver
     ).filter(
