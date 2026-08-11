@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date
+from datetime import datetime
 
 from database import get_db
-from models import Trip, Vehicle, Driver
+from models import Trip, Vehicle, Driver, Tracking
 from schemas import TripCreate, TripResponse
 from routes.auth import role_required
 
@@ -211,6 +212,15 @@ def start_trip(
         )
 
     trip.trip_status = "Started"
+    tracking = Tracking(
+    trip_id=trip.id,
+    location=trip.source,
+    status="Started",
+    remarks="Trip started",
+    timestamp=datetime.utcnow()
+)
+
+db.add(tracking)
 
     db.commit()
 
@@ -254,6 +264,15 @@ def complete_trip(
     ).first()
 
     trip.trip_status = "Delivered"
+    tracking = Tracking(
+    trip_id=trip.id,
+    location=trip.destination,
+    status="Delivered",
+    remarks="Trip completed successfully",
+    timestamp=datetime.utcnow()
+)
+
+db.add(tracking)
 
     vehicle.status = "Available"
 
@@ -301,6 +320,15 @@ def cancel_trip(
     ).first()
 
     trip.trip_status = "Cancelled"
+    tracking = Tracking(
+    trip_id=trip.id,
+    location=trip.destination,
+    status="Cancelled",
+    remarks="Trip cancelled",
+    timestamp=datetime.utcnow()
+)
+
+db.add(tracking)
 
     vehicle.status = "Available"
 
