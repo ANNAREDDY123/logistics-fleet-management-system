@@ -59,12 +59,11 @@ def create_vehicle(
 
     return new_vehicle
 
+# ==========================
 # GET ALL VEHICLES
+# ==========================
 
-@router.get(
-    "/",
-    response_model=list[VehicleResponse]
-)
+@router.get("/")
 def get_all_vehicles(
     status: str = None,
     vehicle_type: str = None,
@@ -73,19 +72,31 @@ def get_all_vehicles(
     db: Session = Depends(get_db)
 ):
 
+    if page < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Page must be greater than 0."
+        )
+
+    if limit < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Limit must be greater than 0."
+        )
+
     query = db.query(Vehicle)
 
     if status:
-
         query = query.filter(
             Vehicle.status == status
         )
 
     if vehicle_type:
-
         query = query.filter(
             Vehicle.vehicle_type == vehicle_type
         )
+
+    total_records = query.count()
 
     vehicles = query.offset(
         (page - 1) * limit
@@ -93,8 +104,12 @@ def get_all_vehicles(
         limit
     ).all()
 
-    return vehicles
-    
+    return {
+        "total_records": total_records,
+        "current_page": page,
+        "limit": limit,
+        "data": vehicles
+    }    
 # GET VEHICLE BY ID
 
 
