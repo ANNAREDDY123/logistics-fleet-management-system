@@ -1,17 +1,16 @@
 from fastapi import FastAPI
-
+from utils.exceptions import global_exception_handler
 from database import Base, engine
-
 from routes import auth, vehicles, drivers, trips, fuel, maintenance, tracking, dashboard, reports
-
-
 Base.metadata.create_all(bind=engine)
-
-
 app = FastAPI(
     title="Logistics & Fleet Management System"
 )
 
+app.add_exception_handler(
+    Exception,
+    global_exception_handler
+)
 
 app.include_router(auth.router)
 app.include_router(vehicles.router)
