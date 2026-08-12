@@ -77,10 +77,7 @@ def create_driver(
 # GET ALL DRIVERS
 # ==========================
 
-@router.get(
-    "/",
-    response_model=list[DriverResponse]
-)
+@router.get("/")
 def get_all_drivers(
     name: str = None,
     status: str = None,
@@ -89,19 +86,31 @@ def get_all_drivers(
     db: Session = Depends(get_db)
 ):
 
+    if page < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Page must be greater than 0."
+        )
+
+    if limit < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Limit must be greater than 0."
+        )
+
     query = db.query(Driver)
 
     if name:
-
         query = query.filter(
             Driver.name.ilike(f"%{name}%")
         )
 
     if status:
-
         query = query.filter(
             Driver.status == status
         )
+
+    total_records = query.count()
 
     drivers = query.offset(
         (page - 1) * limit
@@ -109,8 +118,12 @@ def get_all_drivers(
         limit
     ).all()
 
-    return drivers
-
+    return {
+        "total_records": total_records,
+        "current_page": page,
+        "limit": limit,
+        "data": drivers
+    }
 # UPDATE DRIVER
 
 
