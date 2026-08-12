@@ -72,8 +72,9 @@ def driver_trip_report(
 
 
 
+# ==========================
 # MONTHLY FUEL REPORT
-
+# ==========================
 
 @router.get("/monthly-fuel")
 def monthly_fuel_report(
@@ -82,10 +83,10 @@ def monthly_fuel_report(
 ):
 
     report = db.query(
-        func.strftime("%Y-%m", Fuel.fuel_date).label("month"),
+        func.to_char(Fuel.fuel_date, 'YYYY-MM').label("month"),
         func.sum(Fuel.total_cost).label("expense")
     ).group_by(
-        func.strftime("%Y-%m", Fuel.fuel_date)
+        func.to_char(Fuel.fuel_date, 'YYYY-MM')
     ).all()
 
     return [
@@ -96,9 +97,9 @@ def monthly_fuel_report(
         for row in report
     ]
 
-
+# ==========================
 # MONTHLY MAINTENANCE REPORT
-
+# ==========================
 
 @router.get("/monthly-maintenance")
 def monthly_maintenance_report(
@@ -107,10 +108,10 @@ def monthly_maintenance_report(
 ):
 
     report = db.query(
-        func.strftime("%Y-%m", Maintenance.service_date).label("month"),
+        func.to_char(Maintenance.service_date, 'YYYY-MM').label("month"),
         func.sum(Maintenance.service_cost).label("expense")
     ).group_by(
-        func.strftime("%Y-%m", Maintenance.service_date)
+        func.to_char(Maintenance.service_date, 'YYYY-MM')
     ).all()
 
     return [
