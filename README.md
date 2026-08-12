@@ -131,3 +131,17 @@ A vehicle cannot have multiple active trips.
 A driver cannot have multiple active trips.
 Vehicle and driver statuses are updated automatically during trip lifecycle.
 Global exception handling is implemented.
+
+Database
+
+The application uses PostgreSQL with SQLAlchemy ORM.
+Database configuration is maintained in the application configuration/database files.
+
+Error Handling
+The application provides:
+
+Validation errors
+HTTP exceptions
+Role-based authorization errors
+Global exception handling
+Consistent API error responses
