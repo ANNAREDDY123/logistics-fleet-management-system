@@ -71,6 +71,7 @@ def driver_trip_report(
 
 
 
+
 # MONTHLY FUEL REPORT
 
 
@@ -87,8 +88,13 @@ def monthly_fuel_report(
         func.strftime("%Y-%m", Fuel.fuel_date)
     ).all()
 
-    return report
-
+    return [
+        {
+            "month": row.month,
+            "expense": row.expense
+        }
+        for row in report
+    ]
 
 
 # MONTHLY MAINTENANCE REPORT
@@ -107,4 +113,10 @@ def monthly_maintenance_report(
         func.strftime("%Y-%m", Maintenance.service_date)
     ).all()
 
-    return report
+    return [
+        {
+            "month": row.month,
+            "expense": row.expense
+        }
+        for row in report
+    ]
