@@ -69,8 +69,9 @@ class VehicleResponse(VehicleCreate):
         from_attributes = True
 
   
+# ==========================
 # DRIVER
-
+# ==========================
 
 class DriverCreate(BaseModel):
 
@@ -89,15 +90,27 @@ class DriverCreate(BaseModel):
     status: str = "Active"
 
 
-class DriverResponse(DriverCreate):
+class DriverResponse(BaseModel):
 
     id: int
+
+    name: str
+
+    email: EmailStr
+
+    phone: str
+
+    license_number: str
+
+    license_expiry: date
+
+    experience: int
+
+    status: str
 
     class Config:
 
         from_attributes = True
-
-
 
 # TRIP
 
