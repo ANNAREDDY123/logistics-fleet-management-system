@@ -44,6 +44,7 @@ def vehicle_expense_report(
 
 
 
+
 # DRIVER TRIP REPORT
 
 
@@ -60,7 +61,13 @@ def driver_trip_report(
         Trip.driver_id
     ).all()
 
-    return report
+    return [
+        {
+            "driver_id": row.driver_id,
+            "total_trips": row.total_trips
+        }
+        for row in report
+    ]
 
 
 
