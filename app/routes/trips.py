@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from datetime import date
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 from database import get_db
 from models import Trip, Vehicle, Driver, Tracking
@@ -143,13 +142,11 @@ def create_trip(
     return new_trip
     
 
+# ==========================
 # GET ALL TRIPS
+# ==========================
 
-
-@router.get(
-    "/",
-    response_model=list[TripResponse]
-)
+@router.get("/")
 def get_all_trips(
     trip_status: str = None,
     source: str = None,
@@ -160,31 +157,50 @@ def get_all_trips(
     db: Session = Depends(get_db)
 ):
 
+    if page < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Page must be greater than 0."
+        )
+
+    if limit < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Limit must be greater than 0."
+        )
+
     query = db.query(Trip)
 
     if trip_status:
-
         query = query.filter(
             Trip.trip_status == trip_status
         )
 
     if source:
-
         query = query.filter(
             Trip.source.ilike(f"%{source}%")
         )
 
     if destination:
-
         query = query.filter(
             Trip.destination.ilike(f"%{destination}%")
         )
 
     if start_date:
 
-        query = query.filter(
-            Trip.start_date == start_date
+        start_datetime = datetime.combine(
+            start_date,
+            datetime.min.time()
         )
+
+        end_datetime = start_datetime + timedelta(days=1)
+
+        query = query.filter(
+            Trip.start_date >= start_datetime,
+            Trip.start_date < end_datetime
+        )
+
+    total_records = query.count()
 
     trips = query.offset(
         (page - 1) * limit
@@ -192,8 +208,12 @@ def get_all_trips(
         limit
     ).all()
 
-    return trips
-
+    return {
+        "total_records": total_records,
+        "current_page": page,
+        "limit": limit,
+        "data": trips
+    }
 # GET TRIP BY ID
 
 @router.get(
